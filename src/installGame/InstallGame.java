@@ -25,7 +25,7 @@ public class InstallGame {
     "temp\\temp.txt",
   };
   private final String logFileRoot = "temp\\temp.txt";
-  private StringBuilder installationLog = new StringBuilder("Лог установки игры \n");
+  private StringBuilder installationLogText = new StringBuilder("Лог установки игры \n");
 
   public void initInstallationSequence() {
     initDirectories();
@@ -36,10 +36,11 @@ public class InstallGame {
   private void logInstallation() {
     Path path = Paths.get(installationDir+logFileRoot);
     try {
-      Files.write(path, installationLog.toString().getBytes());
+      Files.write(path, installationLogText.toString().getBytes());
     } catch (IOException error) {
-      error.printStackTrace();
+      System.out.println(error.getMessage());
     }
+    System.out.println("Установка игры закончена. \n" + "Лог установки находится C:\\JavaFileTaskGame\\temp\\temp.txt");
   }
 
   private void initDirectories() {
@@ -47,12 +48,12 @@ public class InstallGame {
       File myDirectory = new File(installationDir+dir);
       if (!myDirectory.exists()) {
         if (myDirectory.mkdirs()) {
-          errorLogHandler(myDirectory.getName(), false);
+          errorLogHandler(myDirectory.getName(), "success");
         } else {
-          errorLogHandler(myDirectory.getName(), true);
+          errorLogHandler(myDirectory.getName(), "error");
         }
       } else {
-        System.out.println(myDirectory.getName() + " Уже присутствует.");
+        errorLogHandler(myDirectory.getName(), "warning");
       }
     }
   }
@@ -62,17 +63,26 @@ public class InstallGame {
       File nestedFile = new File(installationDir+file);
       try{
         nestedFile.createNewFile();
-        errorLogHandler(nestedFile.getName(), false);
+        errorLogHandler(nestedFile.getName(), "success");
       } catch (IOException error){
-        errorLogHandler(nestedFile.getName(), true);
-        error.printStackTrace();
+        errorLogHandler(nestedFile.getName(), "error");
+        System.out.println(error.getMessage());
       };
     }
   }
 
-  private void errorLogHandler(String fileName, boolean isError) {
-    String message = !isError ? "[" + new SimpleDateFormat("HH:mm dd-MM-yyyy").format(new Date()) +  "] " + fileName + " успешно создан." : "Не удалось создать " + fileName;
-    installationLog.append("\n " + message);
+  private void errorLogHandler(String fileName, String stringCode) {
+    String message = "";
+    String messageCommonPart = "[" + new SimpleDateFormat("HH:mm dd-MM-yyyy").format(new Date()) + "] ";
+    switch (stringCode) {
+      case "success" ->
+        message = messageCommonPart + fileName + " успешно создан.";
+      case "error" ->
+        message = messageCommonPart + "Не удалось создать " + fileName;
+      case "warning" ->
+        message = messageCommonPart + fileName + " уже присутствует.";
+    }
+    installationLogText.append("\n " + message);
     System.out.println(message);
   }
 }
