@@ -53,6 +53,10 @@ public class GameProgressSaving {
         System.out.println(error.getMessage());
       }
 
+      deleteUnzippedFiles(saveFilesDirectory);
+    }
+
+    private void deleteUnzippedFiles(String saveFilesDirectory) {
       Path saveFilesDirectoryPath = Path.of(saveFilesDirectory);
       if (Files.isDirectory(saveFilesDirectoryPath)) {
         try (DirectoryStream<Path> directory = Files.newDirectoryStream(saveFilesDirectoryPath)) {
